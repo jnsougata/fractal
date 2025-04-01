@@ -5,6 +5,9 @@ from .table import Table
 
 
 class DB:
+    """
+    A class to represent a database connection and perform operations on it.
+    """
     def __init__(self, path: str = "driz.db"):
         self.connection = sqlite3.connect(path)
         self.cursor = self.connection.cursor()
