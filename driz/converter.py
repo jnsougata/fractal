@@ -1,5 +1,5 @@
 from datetime import datetime, date, time, timedelta
-from typing import Union, Type
+
 
 SQLEquivalentTypes = {
     int: "INTEGER",
@@ -19,7 +19,7 @@ class AsType:
     A class to represent a data type of SQL equivalent types.
     """
 
-    def __init__(self, dtype: Type[Union[int, float, bool, str, bytes, datetime, date, time, timedelta]]):
+    def __init__(self, dtype: type):
         """
         Initializes a TypeConverter instance.
         """
@@ -39,7 +39,7 @@ class AsType:
         """
         Returns the string representation of the data type.
         """
-        return SQLEquivalentTypes.get(self.dtype, "UNKNOWN")
+        return SQLEquivalentTypes.get(self.dtype, "UNKNOWN")  # noqa
 
 
 if __name__ == "__main__":

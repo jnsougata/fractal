@@ -9,7 +9,7 @@ class Field:
     def __init__(
         self,
         name: str,
-        dtype: AsType,
+        dtype: type,
         *constraints: str,
     ):
         """
@@ -17,10 +17,10 @@ class Field:
 
         Args:
             name (str): The name of the field.
-            dtype (AsType): The data type of the field.
+            dtype (Type): The data type of the field.
         """
         self.name = name
-        self.sql_type = str(dtype)
+        self.sql_type = str(AsType(dtype))
         self.constraints = list(constraints)
 
 
