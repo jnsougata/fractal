@@ -1,4 +1,4 @@
-from .typeconverter import AsType
+from .converter import AsType
 
 
 class Field:

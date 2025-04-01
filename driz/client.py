@@ -5,9 +5,8 @@ from .table import Table
 
 
 class DB:
-    def __init__(self, db_path: str = "driz.db"):
-        self.db_path = db_path
-        self.connection = sqlite3.connect(db_path)
+    def __init__(self, path: str = "driz.db"):
+        self.connection = sqlite3.connect(path)
         self.cursor = self.connection.cursor()
 
     def close(self):
