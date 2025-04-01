@@ -11,7 +11,7 @@ setup(
     description='A lightweight, simple, and fast SQLite wrapper for Python.',
     long_description=readme,
     long_description_content_type="text/markdown",
-    url='https://github.com/jnsougata/aiotube',
+    url='https://github.com/jnsougata/driz',
     author='Sougata Jana',
     author_email='jnsougata@gmail.com',
     classifiers=[
@@ -27,12 +27,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Utilities',
     ],
-    packages=['aiotube'],
-    keywords='youtube, youtube-data, youtube-api, youtube-data-api-v3',
-    python_requires='>=3.8.0',
-    install_requires=['urllib3'],
-    project_urls={
-        'Documentation': 'https://aiotube.readthedocs.io/en/latest/',
-        'Source': 'https://github.com/jnsougata/aiotube'
-    },
+    packages=['driz'],
+    keywords='sqlite, wrapper, database, lightweight',
+    python_requires='>=3.8.0'
 )
