@@ -1,8 +1,6 @@
 ![driz](https://github.com/user-attachments/assets/75f99420-b480-4199-987d-8542e6236507)
-
 # Driz - Pseudo K-V Database
-
-A lightweight, efficient SQLite wrapper for Python that makes SQLite3 feel like NoSQL, while retaining SQL’s filtering and sorting power.
+A fast, lightweight key-value store designed for hobbyists, combining the simplicity of NoSQL with SQLite3's robust filtering and sorting capabilities.
 ## Features
 - **NoSQL-like Experience** – Work with database records as Python dictionaries.
 - **Simplified Access** – Retrieve data without remembering column names or indices.
