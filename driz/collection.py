@@ -1,5 +1,5 @@
 import sqlite3
-from typing import Optional, Union, Dict, Any
+from typing import Optional, Union, Dict, Any, List
 
 from .schema import Schema, as_sql_type
 
@@ -73,6 +73,37 @@ class Collection:
         Fetch all rows from the table.
         """
         self.cursor.execute(f"SELECT * FROM {self.name}")
+        return [
+            dict(zip([column[0] for column in self.cursor.description], row))
+            for row in self.cursor.fetchall()
+        ]
+
+    def union(self, other: "Collection") -> List[Dict[str, Any]]:
+        """
+        Fetch all rows from two collections.
+        """
+        self.cursor.execute(f"SELECT * FROM {self.name} UNION SELECT * FROM {other.name}")
+        return [
+            dict(zip([column[0] for column in self.cursor.description], row))
+            for row in self.cursor.fetchall()
+        ]
+
+    def distinct(self, column: str) -> List[Any]:
+        """
+        Fetch distinct values from a column.
+        """
+        self.cursor.execute(f"SELECT DISTINCT {column} FROM {self.name}")
+        return [row[0] for row in self.cursor.fetchall()]
+
+    def order_by(self, *columns: str, desc: bool = False) -> List[Dict[str, Any]]:
+        """
+        Fetch all rows ordered by one or more columns.
+        """
+        order = "DESC" if desc else "ASC"
+        if len(columns) == 0:
+            raise ValueError("At least one column must be specified.")
+        placeholder = ", ".join(columns)
+        self.cursor.execute(f"SELECT * FROM {self.name} ORDER BY {placeholder} {order}")
         return [
             dict(zip([column[0] for column in self.cursor.description], row))
             for row in self.cursor.fetchall()
