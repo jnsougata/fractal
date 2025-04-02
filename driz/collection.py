@@ -23,6 +23,22 @@ class Collection:
         self.connection = connection
         self.cursor = connection.cursor()
 
+    def clear(self):
+        """
+        Clears the contents of the collection.
+        """
+        self.cursor.execute(f"TRUNCATE TABLE {self.name}")
+        self.connection.commit()
+
+    def drop(self, confirm: bool = False):
+        """
+        Drops the collection from the database.
+        """
+        if not confirm:
+            raise RuntimeWarning("Are you sure you want to drop this table? Use confirm=True to proceed.")
+        self.cursor.execute(f"DROP TABLE IF EXISTS {self.name}")
+        self.connection.commit()
+
     def insert(self, **data):
         """
         Insert a row into the table.
