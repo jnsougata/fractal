@@ -1,10 +1,10 @@
 import sqlite3
 from typing import Union, Optional
 
-from .schema import Schema, AsType
+from .schema import Schema, as_sql_type
 
 
-class Table:
+class Collection:
     """
     A class to represent a table with headers and rows.
     """
@@ -32,7 +32,7 @@ class Table:
         for field in self.schema.fields:
             if field.name not in data:
                 raise ValueError(f"Missing field: {field.name}")
-            if str(AsType(type(data[field.name]))) != field.sql_type:
+            if str(as_sql_type(type(data[field.name]))) != field.sql_type:
                 raise TypeError(f"Incorrect type for field: {field.name}")
 
         columns = ", ".join(data.keys())
@@ -43,21 +43,21 @@ class Table:
         self.connection.commit()
         return self.cursor.lastrowid
 
-    def delete(self, id: int):
+    def delete(self, key: int):
         """
         Delete a row by its ID.
         """
-        self.cursor.execute(f"DELETE FROM {self.name} WHERE id = ?", (id,))
+        self.cursor.execute(f"DELETE FROM {self.name} WHERE id = ?", (key,))
         self.connection.commit()
 
-    def fetch(self, id: Union[int, str]) -> Optional[dict]:
+    def fetch(self, key: Union[int, str]) -> Optional[dict]:
         """
         Fetch all rows from the table.
         """
-        if isinstance(id, int):
-            self.cursor.execute(f"SELECT * FROM {self.name} WHERE id = ?", (id,))
-        elif isinstance(id, str):
-            self.cursor.execute(f"SELECT * FROM {self.name} WHERE name = ?", (id,))
+        if isinstance(key, int):
+            self.cursor.execute(f"SELECT * FROM {self.name} WHERE id = ?", (key,))
+        elif isinstance(key, str):
+            self.cursor.execute(f"SELECT * FROM {self.name} WHERE name = ?", (key,))
         else:
             raise TypeError("Key must be either an integer or a string.")
         return self.cursor.fetchone()
@@ -70,7 +70,7 @@ class Table:
         for row in self.cursor.fetchall():
             yield dict(zip([column[0] for column in self.cursor.description], row))
 
-    def fetch_all(self):
+    def all(self):
         """
         Fetch all rows from the table.
         """

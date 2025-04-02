@@ -1,7 +1,7 @@
-from .converter import AsType
+from .converter import as_sql_type
 
 
-class Field:
+class Column:
     """
     A class representing a field in the database schema.
     """
@@ -20,7 +20,7 @@ class Field:
             dtype (Type): The data type of the field.
         """
         self.name = name
-        self.sql_type = str(AsType(dtype))
+        self.sql_type = str(as_sql_type(dtype))
         self.constraints = list(constraints)
 
 
@@ -29,20 +29,20 @@ class Schema:
     A class representing the schema of a database.
     """
 
-    def __init__(self, table_name: str, *fields: Field):
+    def __init__(self, *fields: Column):
         """
         Initializes a Schema instance.
 
         Args:
-            table_name (str): The name of the table.
+            collection (str): The name of the collection.
         """
-        self.table_name = table_name
+        self.collection = None
         self.fields = list(fields)
 
-    def add_field(self, field: Field):
+    def add_field(self, field: Column):
         """
         Adds a fields to the schema.
         Args:
-            field (Field): The field to add to the schema.
+            field (Column): The field to add to the schema.
         """
         self.fields.append(field)
