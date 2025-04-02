@@ -1,5 +1,5 @@
 import sqlite3
-from typing import Optional, Union
+from typing import Optional, Union, Dict, Any
 
 from .schema import Schema, as_sql_type
 
@@ -27,9 +27,9 @@ class Collection:
         """
         Insert a row into the table.
         """
-        if len(data) != len(self.schema.fields):
+        if len(data) != len(self.schema.columns):
             raise ValueError("Data length does not match schema fields length.")
-        for field in self.schema.fields:
+        for field in self.schema.columns:
             if field.name not in data:
                 raise ValueError(f"Missing field: {field.name}")
             if str(as_sql_type(type(data[field.name]))) != field.sql_type:
@@ -50,17 +50,15 @@ class Collection:
         self.cursor.execute(f"DELETE FROM {self.name} WHERE id = ?", (key,))
         self.connection.commit()
 
-    def fetch(self, key: Union[int, str]) -> Optional[dict]:
+    def fetch(self, key: Union[int, str]) -> Optional[Dict[str, Any]]:
         """
         Fetch all rows from the table.
         """
-        if isinstance(key, int):
-            self.cursor.execute(f"SELECT * FROM {self.name} WHERE id = ?", (key,))
-        elif isinstance(key, str):
-            self.cursor.execute(f"SELECT * FROM {self.name} WHERE name = ?", (key,))
-        else:
-            raise TypeError("Key must be either an integer or a string.")
-        return self.cursor.fetchone()
+        self.cursor.execute(f"SELECT * FROM {self.name} WHERE id = ?", (key,))
+        data = self.cursor.fetchone()
+        if data is None:
+            return None
+        return dict(zip([column[0] for column in self.cursor.description], data))
 
     def __iter__(self):
         """
@@ -79,3 +77,66 @@ class Collection:
             dict(zip([column[0] for column in self.cursor.description], row))
             for row in self.cursor.fetchall()
         ]
+
+    def avg(self, column: str) -> float:
+        """
+        Calculate the average of a numeric column.
+        """
+        self.cursor.execute(f"SELECT AVG({column}) FROM {self.name}")
+        return self.cursor.fetchone()[0]
+
+    def sum(self, column: str) -> float:
+        """
+        Calculate the sum of a numeric column.
+        """
+        self.cursor.execute(f"SELECT SUM({column}) FROM {self.name}")
+        return self.cursor.fetchone()[0]
+
+    def min(self, column: str) -> Union[int, float]:
+        """
+        Calculate the minimum of a numeric column.
+        """
+        self.cursor.execute(f"SELECT MIN({column}) FROM {self.name}")
+        return self.cursor.fetchone()[0]
+
+    def max(self, column: str) -> Union[int, float]:
+        """
+        Calculate the maximum of a numeric column.
+        """
+        self.cursor.execute(f"SELECT MAX({column}) FROM {self.name}")
+        return self.cursor.fetchone()[0]
+
+    @property
+    def count(self) -> int:
+        """
+        Count the number of rows in the table.
+        """
+        self.cursor.execute(f"SELECT COUNT(*) FROM {self.name}")
+        return self.cursor.fetchone()[0]
+
+    def where(self, *conditions: str):
+        """
+        Execute a custom SQL query.
+        """
+        conditions = ", ".join(conditions)
+        self.cursor.execute(f"SELECT * FROM {self.name} WHERE {conditions};")
+        return [
+            dict(zip([column[0] for column in self.cursor.description], row))
+            for row in self.cursor.fetchall()
+        ]
+
+    def update(self, key: Union[int, str], **data):
+        """
+        Update a row by its ID.
+        """
+        allowed = [f.name for f in self.schema.columns]
+        for k, v in data.items():
+            if k not in allowed:
+                raise ValueError(f"Invalid field: {k}")
+            if as_sql_type(type(v)) != self.schema.get_column_type(k):
+                raise TypeError(f"Incorrect type for field: {k}")
+        placeholders = ", ".join(f"{k} = ?" for k in data.keys())
+        values = tuple(data.values()) + (key,)
+        sql = f"UPDATE {self.name} SET {placeholders} WHERE id = ?"
+        self.cursor.execute(sql, values)
+        self.connection.commit()

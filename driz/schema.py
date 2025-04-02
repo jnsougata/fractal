@@ -1,5 +1,5 @@
 from .converter import as_sql_type
-
+from .errors import ColumnNotFound
 
 class Column:
     """
@@ -37,12 +37,24 @@ class Schema:
             collection (str): The name of the collection.
         """
         self.collection = None
-        self.fields = list(fields)
+        self.columns = list(fields)
 
-    def add_field(self, field: Column):
+    def add_column(self, field: Column):
         """
         Adds a fields to the schema.
         Args:
             field (Column): The field to add to the schema.
         """
-        self.fields.append(field)
+        self.columns.append(field)
+
+    def get_column_type(self, column: str) -> str:
+        """
+        Returns the SQL type of column in the schema.
+
+        Args:
+            column (str): The name of the column.
+        """
+        for c in self.columns:
+            if c.name == column:
+                return c.sql_type
+        raise ColumnNotFound(f"Column '{column}' not found in schema.")
