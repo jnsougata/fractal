@@ -1,14 +1,17 @@
 import sqlite3
 from typing import Optional
 
-from .schema import Schema, Column
 from .collection import Collection
 from .converter import from_sql_type
+from .errors import CollectionNotFound
+from .schema import Column, Schema
+
 
 class DB:
     """
     A class to represent a database connection and perform operations on it.
     """
+
     def __init__(self, path: str = "driz.db"):
         self.connection = sqlite3.connect(path)
         self.cursor = self.connection.cursor()
@@ -27,7 +30,7 @@ class DB:
         if exc_type is not None:
             raise exc_val
 
-    def collection(self, name: str, *, schema: Optional[Schema] = None) -> Optional[Collection]:
+    def collection(self, name: str, *, schema: Optional[Schema] = None) -> Collection:
         """
         Tries to fetch a collection from the database. If it doesn't exist, it creates a new one.
 
@@ -36,11 +39,18 @@ class DB:
             schema (Schema, optional): The schema of the collection. If not provided, it will be fetched from the database.
         """
         if not schema:
-            self.cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{name}'")
+            self.cursor.execute(
+                f"SELECT name FROM sqlite_master WHERE type='table' AND name='{name}'"
+            )
             if not self.cursor.fetchone():
-                return None
+                raise CollectionNotFound(f"Collection '{name}' not found.")
             self.cursor.execute(f"PRAGMA table_info({name})")
-            schema = Schema(*[Column(column[1], from_sql_type(column[2])) for column in self.cursor.fetchall()])
+            schema = Schema(
+                *[
+                    Column(column[1], from_sql_type(column[2]))
+                    for column in self.cursor.fetchall()
+                ]
+            )
         schema.collection = name
         return self._create_collection(schema)
 
@@ -63,6 +73,8 @@ class DB:
         column_map = {column[1]: column[2] for column in columns}
         for field in schema.fields:
             if field.name not in column_map:
-                self.cursor.execute(f"ALTER TABLE {schema.collection} ADD COLUMN {field.name} {field.sql_type}")
+                self.cursor.execute(
+                    f"ALTER TABLE {schema.collection} ADD COLUMN {field.name} {field.sql_type}"
+                )
                 self.connection.commit()
         return Collection(schema.collection, schema, self.connection)

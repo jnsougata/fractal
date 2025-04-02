@@ -1,5 +1,5 @@
 import sqlite3
-from typing import Union, Optional
+from typing import Optional, Union
 
 from .schema import Schema, as_sql_type
 
@@ -75,4 +75,7 @@ class Collection:
         Fetch all rows from the table.
         """
         self.cursor.execute(f"SELECT * FROM {self.name}")
-        return [dict(zip([column[0] for column in self.cursor.description], row)) for row in self.cursor.fetchall()]
+        return [
+            dict(zip([column[0] for column in self.cursor.description], row))
+            for row in self.cursor.fetchall()
+        ]
