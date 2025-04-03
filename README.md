@@ -40,6 +40,7 @@ users.delete(1)
 
 ## Documentation
 Coming soon! For now, refer to the code comments and examples or source dive.
+Half-baked docs [here.](https://driz.readthedocs.io/en/latest/)
 
 ## TODO
 - Add more SQL features (e.g., `JOIN`, `GROUP BY`).
