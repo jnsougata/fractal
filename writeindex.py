@@ -7,7 +7,7 @@ with open("./docs/index.rst", "w") as f:
              f"\n"
              f"\n"
              f"\n")
-    templ = ("\n.. autoclass:: discohook.{0}"
+    templ = ("\n.. autoclass:: driz.{0}"
              "\n    :members:"
              "\n    :undoc-members:"
              "\n    :show-inheritance:"
