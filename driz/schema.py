@@ -48,7 +48,7 @@ class Field:
         if check:
             self.constraints += f"CHECK ({check}) "
         if ref_collection and ref_field:
-            self.constraints += f"REFERENCES {ref_collection}({ref_field}) "
+            self.constraints += f"REFERENCES {ref_collection}({ref_field}) ON DELETE CASCADE "
 
 
 class Schema:

@@ -21,6 +21,7 @@ class DB:
 
     def __init__(self, path: str = "driz.db"):
         self.connection = sqlite3.connect(path)
+        self.connection.execute("PRAGMA foreign_keys = ON;")
         self.cursor = self.connection.cursor()
 
     def close(self):
