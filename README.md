@@ -13,19 +13,20 @@ pip install git+https://github.com/jnsougata/driz.git
 ```
 
 ## Example Usage
+
 ```python
 import driz
 
 db = driz.DB("example.db")
 users = db.collection(
-    "users", 
+    "users",
     schema=driz.Schema(
-    driz.Column("id", int, "PRIMARY KEY"),
-    driz.Column("name", str, "NOT NULL"),
-    driz.Column("age", int, "NOT NULL"),
-    driz.Column("email", str, "UNIQUE"),
-    driz.Column("is_active", bool, "DEFAULT 1"),
-))
+        driz.Field("id", int, "PRIMARY KEY"),
+        driz.Field("name", str, "NOT NULL"),
+        driz.Field("age", int, "NOT NULL"),
+        driz.Field("email", str, "UNIQUE"),
+        driz.Field("is_active", bool, "DEFAULT 1"),
+    ))
 users.insert(
     id=1,
     name="John Doe",

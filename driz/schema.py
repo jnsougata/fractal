@@ -1,35 +1,42 @@
 from .converter import as_sql_type
-from .errors import ColumnNotFound
+from .errors import FieldNotFound
 
-class Column:
+from typing import Tuple, List
+
+class Field:
     """
-    A class representing a column header in the database schema.
+    A class representing a field in the database schema.
+
+    Args:
+        name (str): The name of the field.
+        dtype (Type): The data type of the field.
+        constraints (str): Optional constraints for the field (e.g., "NOT NULL", "UNIQUE").
+
+    Attributes:
+        name (str): The name of the field.
+        sql_type (str): The SQL type of the field.
+        * constraints (Tuple[str]): The constraints for the field.
     """
 
-    def __init__(
-        self,
-        name: str,
-        dtype: type,
-        *constraints: str,
-    ):
-        """
-        Initializes a Field instance.
-
-        Args:
-            name (str): The name of the field.
-            dtype (Type): The data type of the field.
-        """
+    def __init__(self, name: str, dtype: type, *constraints: str):
         self.name = name
         self.sql_type = str(as_sql_type(dtype))
-        self.constraints = list(constraints)
+        self.constraints = constraints  # noqa
 
 
 class Schema:
     """
     A class representing the schema of a database.
+
+    Attributes:
+        collection (str): The name of the collection.
+        fields (List[Field]): The fields in the schema.
+
+    Args:
+        *fields (Field): The fields in the schema.
     """
 
-    def __init__(self, *fields: Column):
+    def __init__(self, *fields: Field):
         """
         Initializes a Schema instance.
 
@@ -37,24 +44,25 @@ class Schema:
             collection (str): The name of the collection.
         """
         self.collection = None
-        self.columns = list(fields)
+        self.fields: List[Field] = list(fields)  # noqa
 
-    def add_column(self, field: Column):
+    def append(self, *fields: Field):
         """
-        Adds a fields to the schema.
-        Args:
-            field (Column): The field to add to the schema.
-        """
-        self.columns.append(field)
-
-    def get_column_type(self, column: str) -> str:
-        """
-        Returns the SQL type of column in the schema.
+        Adds a field to the schema.
 
         Args:
-            column (str): The name of the column.
+            *fields (Field): The fields to be added to the schema
         """
-        for c in self.columns:
-            if c.name == column:
+        self.fields.extend(fields)
+
+    def resolve_field_type(self, field: str) -> str:
+        """
+        Retrieves the data type of a field in the schema.
+
+        Args:
+            field (str): The name of the column.
+        """
+        for c in self.fields:
+            if c.name == field:
                 return c.sql_type
-        raise ColumnNotFound(f"Column '{column}' not found in schema.")
+        raise FieldNotFound(f"Field '{field}' not found in schema.")

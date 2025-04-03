@@ -3,7 +3,7 @@ class CollectionNotFound(Exception):
 
     pass
 
-class ColumnNotFound(Exception):
+class FieldNotFound(Exception):
     """Exception raised when a column is not found in the database."""
 
     pass

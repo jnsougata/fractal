@@ -4,12 +4,19 @@ from typing import Optional
 from .collection import Collection
 from .converter import from_sql_type
 from .errors import CollectionNotFound
-from .schema import Column, Schema
+from .schema import Field, Schema
 
 
 class DB:
     """
     A class to represent a database connection and perform operations on it.
+
+    Attributes:
+        connection (sqlite3.Connection): The SQLite database connection.
+        cursor (sqlite3.Cursor): The SQLite database cursor.
+
+    Args:
+        path (str): The path to the SQLite database file. Defaults to "driz.db".
     """
 
     def __init__(self, path: str = "driz.db"):
@@ -47,7 +54,7 @@ class DB:
             self.cursor.execute(f"PRAGMA table_info({name})")
             schema = Schema(
                 *[
-                    Column(column[1], from_sql_type(column[2]))
+                    Field(column[1], from_sql_type(column[2]))
                     for column in self.cursor.fetchall()
                 ]
             )
@@ -56,14 +63,14 @@ class DB:
 
     def _create_collection(self, schema: Schema) -> Collection:
         """
-        Creates a table in the database.
+        Creates a collection in the database.
 
         Args:
             schema (Schema): The schema of the table.
         """
         fields = ", ".join(
             f"{field.name} {field.sql_type} {' '.join(field.constraints)}"
-            for field in schema.columns
+            for field in schema.fields
         )
         sql = f"CREATE TABLE IF NOT EXISTS {schema.collection} ({fields})"
         self.cursor.execute(sql)
@@ -71,7 +78,7 @@ class DB:
         self.cursor.execute(f"PRAGMA table_info({schema.collection})")
         columns = self.cursor.fetchall()
         column_map = {column[1]: column[2] for column in columns}
-        for field in schema.columns:
+        for field in schema.fields:
             if field.name not in column_map:
                 self.cursor.execute(
                     f"ALTER TABLE {schema.collection} ADD COLUMN {field.name} {field.sql_type}"

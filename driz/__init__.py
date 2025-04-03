@@ -20,5 +20,5 @@ __version__ = "0.0.1"
 from .client import DB
 from .converter import date, datetime, time, timedelta
 from .errors import *
-from .schema import Column, Schema
+from .schema import Field, Schema
 from .query import *
