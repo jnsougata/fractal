@@ -5,6 +5,8 @@ __all__ = [
     "datetime",
     "time",
     "timedelta",
+    "as_sql_type",
+    "from_sql_type",
 ]
 
 _SQLEquivalentTypes = {

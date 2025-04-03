@@ -70,8 +70,8 @@ class DB:
             schema (Schema): The schema of the table.
         """
         fields = ", ".join(
-            f"{field.name} {field.sql_type} {field.constraints}"
-            for field in schema.fields
+            f"{name} {field.sql_type} {field.constraints}"
+            for name, field in schema.fields.items()
         )
         sql = f"CREATE TABLE IF NOT EXISTS {schema.collection} ({fields})"
         self.cursor.execute(sql)
@@ -79,10 +79,10 @@ class DB:
         self.cursor.execute(f"PRAGMA table_info({schema.collection})")
         columns = self.cursor.fetchall()
         column_map = {column[1]: column[2] for column in columns}
-        for field in schema.fields:
-            if field.name not in column_map:
+        for name, field in schema.fields.items():
+            if not column_map.get(name):
                 self.cursor.execute(
-                    f"ALTER TABLE {schema.collection} ADD COLUMN {field.name} {field.sql_type}"
+                    f"ALTER TABLE {schema.collection} ADD COLUMN {name} {field.sql_type}"
                 )
                 self.connection.commit()
         return Collection(schema.collection, schema, self.connection)

@@ -1,7 +1,7 @@
-import sqlite3
-from typing import Optional, Union, Dict, Any, List
-import uuid
 import datetime
+import sqlite3
+import uuid
+from typing import Any, Dict, List, Union
 
 from .errors import FieldNotFound
 from .schema import Schema, as_sql_type
@@ -59,32 +59,35 @@ class Collection:
         self.connection.commit()
         return True
 
-    def insert(self, **data) -> str:
+    def insert(self, *records: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Insert a record into the collection.
+        Insert records into the collection.
 
         Args:
-            **data: The data to insert into the collection.
+            *records (Dict[str, Any]): The records to insert.
         Returns:
-            str: The key of the inserted record.
+            Dict[str, Any]: The inserted data with the key and timestamp.
         """
-        data["key"] = uuid.uuid4().hex
-        data["timestamp"] = datetime.datetime.now()
-        if len(data) != len(self.schema.fields):
-            raise ValueError("Data length does not match schema fields length.")
-        for field in self.schema.fields:
-            if field.name not in data:
-                raise ValueError(f"Missing field: {field.name}")
-            if str(as_sql_type(type(data[field.name]))) != field.sql_type:
-                raise TypeError(f"Incorrect type for field: {field.name}")
-
-        columns = ", ".join(data.keys())
-        placeholders = ", ".join("?" * len(data))
-        values = tuple(data.values())
-        sql = f"INSERT INTO {self.name} ({columns}) VALUES ({placeholders})"
-        self.cursor.execute(sql, values)
+        now = datetime.datetime.now()
+        fields = records[0].keys()
+        batch = []
+        for record in records:
+            record["key"] = uuid.uuid4().hex
+            record["timestamp"] = now
+        for record in records:
+            if len(record) != len(self.schema.fields):
+                raise ValueError("Data length does not match schema fields length.")
+            for k, v in record.items():
+                if not self.schema.fields.get(k):
+                    raise ValueError(f"Invalid field: {k}")
+                if as_sql_type(type(v)) != self.schema.resolve_field_type(k):
+                    raise TypeError(f"Incorrect type for field: {k}")
+            batch.append(tuple(record[f] for f in fields))
+        columns = ", ".join(fields)
+        sql = f"INSERT INTO {self.name} ({columns}) VALUES ({", ".join("?" * len(fields))})"
+        self.cursor.executemany(sql, batch)
         self.connection.commit()
-        return data["key"]
+        return {record["key"]: record for record in records}
 
     def delete(self, key: Union[int, str]):
         """
@@ -109,7 +112,9 @@ class Collection:
             self.cursor.execute(f"ALTER TABLE {self.name} DROP COLUMN {field}")
             self.connection.commit()
         except sqlite3.OperationalError as e:
-            raise FieldNotFound(f"field '{field}' not found in collection '{self.name}'.") from e
+            raise FieldNotFound(
+                f"field '{field}' not found in collection '{self.name}'."
+            ) from e
 
     def fetch(self, key: str) -> Dict[str, Any]:
         """
@@ -149,7 +154,9 @@ class Collection:
         """
         Fetch all records from two collections.
         """
-        self.cursor.execute(f"SELECT * FROM {self.name} UNION SELECT * FROM {other.name}")
+        self.cursor.execute(
+            f"SELECT * FROM {self.name} UNION SELECT * FROM {other.name}"
+        )
         return [
             dict(zip([column[0] for column in self.cursor.description], row))
             for row in self.cursor.fetchall()
@@ -282,22 +289,20 @@ class Collection:
             for row in self.cursor.fetchall()
         ]
 
-    def update(self, key: Union[int, str], **data: Any):
+    def update(self, key: str, **data: Any):
         """
         Update a record by its key.
 
         Args:
-            key (Union[int, str]): The key of the record to update.
+            key (str): The key of the record to update.
             **data: The data to update in the record.
         """
-        allowed = [f.name for f in self.schema.fields]
-        for k, v in data.items():
-            if k not in allowed:
-                raise ValueError(f"Invalid field: {k}")
-            if as_sql_type(type(v)) != self.schema.resolve_field_type(k):
-                raise TypeError(f"Incorrect type for field: {k}")
+        for name, value in data.items():
+            if not self.schema.fields.items().get(name):
+                raise ValueError(f"Invalid field: {name}")
+            if as_sql_type(type(value)) != self.schema.resolve_field_type(k):
+                raise TypeError(f"Incorrect type for field: {name}")
         placeholders = ", ".join(f"{k} = ?" for k in data.keys())
-        values = tuple(data.values()) + (key,)
-        sql = f"UPDATE {self.name} SET {placeholders} WHERE id = ?"
-        self.cursor.execute(sql, values)
+        args = tuple(data.values()) + (key,)
+        self.cursor.execute(f"UPDATE {self.name} SET {placeholders} WHERE key = ?", args)
         self.connection.commit()
