@@ -3,7 +3,7 @@ from .errors import ColumnNotFound
 
 class Column:
     """
-    A class representing a field in the database schema.
+    A class representing a column header in the database schema.
     """
 
     def __init__(
