@@ -111,14 +111,20 @@ class Collection:
         except sqlite3.OperationalError as e:
             raise FieldNotFound(f"field '{field}' not found in collection '{self.name}'.") from e
 
-    def fetch(self, key: Union[int, str]) -> Optional[Dict[str, Any]]:
+    def fetch(self, key: str) -> Dict[str, Any]:
         """
-        Fetch all records from the collection.
+        Fetch a record by its key.
+
+        Args:
+            key (str): The key of the record to fetch.
+
+        Returns:
+            Dict[str, Any]: A dictionary representing the record with the specified key.
         """
         self.cursor.execute(f"SELECT * FROM {self.name} WHERE key = ?", (key,))
         data = self.cursor.fetchone()
         if data is None:
-            return None
+            return {}
         return dict(zip([column[0] for column in self.cursor.description], data))
 
     def __iter__(self):

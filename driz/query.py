@@ -38,21 +38,31 @@ def both(c1: str, c2: str) -> str:
 def either(c1: str, c2: str) -> str:
     return f"{c1} OR {c2}"
 
-def contains(column: str, value: str) -> str:
-    return f"{column} LIKE '%{value}%'"
+def contains(field: str, value: str) -> str:
+    return f"{field} LIKE '%{value}%'"
 
-def startswith(column: str, prefix: str) -> str:
-    return f"{column} LIKE '{prefix}%'"
+def startswith(field: str, prefix: str) -> str:
+    return f"{field} LIKE '{prefix}%'"
 
-def endswith(column: str, suffix: str) -> str:
-    return f"{column} LIKE '%{suffix}'"
+def endswith(field: str, suffix: str) -> str:
+    return f"{field} LIKE '%{suffix}'"
 
-def equals(column: str, value) -> str:
+def equals(field: str, value) -> str:
     if isinstance(value, (int, float)):
-        return f"{column} = {value}"
-    return f"{column} LIKE '{value}'"
+        return f"{field} = {value}"
+    return f"{field} LIKE '{value}'"
 
-def anyof(column: str, *values: Any) -> str:
+def anyof(field: str, *values: Any) -> str:
+    v = []
+    for value in values:
+        if isinstance(value, str):
+            v.append(f"'{value}'")
+        else:
+            v.append(str(value))
+    values_str = ", ".join(f"'{str(value)}'" for value in values)
+    return f"{field} IN ({values_str})"
+
+def noneof(field: str, *values: Any) -> str:
     v = []
     for value in values:
         if isinstance(value, str):
@@ -60,37 +70,27 @@ def anyof(column: str, *values: Any) -> str:
         else:
             v.append(str(value))
     values_str = ", ".join(f"{str(value)}" for value in v)
-    return f"{column} IN ({values_str})"
+    return f"{field} NOT IN ({values_str})"
 
-def noneof(column: str, *values: Any) -> str:
-    v = []
-    for value in values:
-        if isinstance(value, str):
-            v.append(f"'{value}'")
-        else:
-            v.append(str(value))
-    values_str = ", ".join(f"{str(value)}" for value in v)
-    return f"{column} NOT IN ({values_str})"
+def between(field: str, start: Union[int, float], end: Union[int, float]) -> str:
+    return f"{field} BETWEEN {start} AND {end}"
 
-def between(column: str, start: Union[int, float], end: Union[int, float]) -> str:
-    return f"{column} BETWEEN {start} AND {end}"
+def isnull(field: str) -> str:
+    return f"{field} IS NULL"
 
-def isnull(column: str) -> str:
-    return f"{column} IS NULL"
-
-def gt(column: str, value: Union[int, float]) -> str:
-    return f"{column} > {value}"
-def gte(column: str, value: Union[int, float]) -> str:
-    return f"{column} >= {value}"
-def lt(column: str, value: Union[int, float]) -> str:
-    return f"{column} < {value}"
-def lte(column: str, value: Union[int, float]) -> str:
-    return f"{column} <= {value}"
+def gt(field: str, value: Union[int, float]) -> str:
+    return f"{field} > {value}"
+def gte(field: str, value: Union[int, float]) -> str:
+    return f"{field} >= {value}"
+def lt(field: str, value: Union[int, float]) -> str:
+    return f"{field} < {value}"
+def lte(field: str, value: Union[int, float]) -> str:
+    return f"{field} <= {value}"
 
 if __name__ == "__main__":
     print(startswith("name", "John"))  # Output: name LIKE 'John%'
     print(endswith("name", "Doe"))  # Output: name LIKE '%Doe'
     print(contains("name", "John"))  # Output: name LIKE '%John%'
     print(equals("name", "John Doe"))  # Output: name = 'John Doe'
-    print(anyof("name", ["John Doe", "Jane Doe"]))  # Output: name IN ('John Doe', 'Jane Doe')
+    print(anyof("name", "John Doe", "Jane Doe"))  # Output: name IN ('John Doe', 'Jane Doe')
     print(between("age", 18, 30))  # Output: age BETWEEN '18' AND '30'
