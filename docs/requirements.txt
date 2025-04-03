@@ -1,0 +1,4 @@
+aiohttp
+pynacl
+furo
+starlette

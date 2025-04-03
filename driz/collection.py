@@ -71,6 +71,13 @@ class Collection:
         self.cursor.execute(f"DELETE FROM {self.name} WHERE id = ?", (key,))
         self.connection.commit()
 
+    def remove_column(self, column: str):
+        """
+        Remove a column from the table.
+        """
+        self.cursor.execute(f"ALTER TABLE {self.name} DROP COLUMN {column}")
+        self.connection.commit()
+
     def fetch(self, key: Union[int, str]) -> Optional[Dict[str, Any]]:
         """
         Fetch all rows from the table.
@@ -104,6 +111,18 @@ class Collection:
         Fetch all rows from two collections.
         """
         self.cursor.execute(f"SELECT * FROM {self.name} UNION SELECT * FROM {other.name}")
+        return [
+            dict(zip([column[0] for column in self.cursor.description], row))
+            for row in self.cursor.fetchall()
+        ]
+
+    def join(self, column: str, other: "Collection", on: str) -> List[Dict[str, Any]]:
+        """
+        Join two collections on a specified column.
+        """
+        self.cursor.execute(
+            f"SELECT * FROM {self.name} JOIN {other.name} ON {self.name}.{column} = {other.name}.{on}"
+        )
         return [
             dict(zip([column[0] for column in self.cursor.description], row))
             for row in self.cursor.fetchall()
