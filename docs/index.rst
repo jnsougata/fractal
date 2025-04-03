@@ -1,21 +1,4 @@
-.. automodule:: driz
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. autoclass:: driz.CollectionNotFound
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-.. autoclass:: driz.Column
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-.. autoclass:: driz.ColumnNotFound
+.. automodule:: driz.errors
     :members:
     :undoc-members:
     :show-inheritance:
@@ -27,13 +10,13 @@
     :show-inheritance:
 
 
-.. autoclass:: driz.Schema
+.. autoclass:: driz.Field
     :members:
     :undoc-members:
     :show-inheritance:
 
 
-.. autoclass:: driz.Union
+.. autoclass:: driz.Schema
     :members:
     :undoc-members:
     :show-inheritance:
