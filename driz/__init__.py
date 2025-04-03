@@ -1,12 +1,11 @@
 """
-Driz
+driz
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A fast lightweight k-v storage for hobbyists.
 
 :copyright: (c) 2025-present Sougata Jana
 :license: MIT, see LICENSE for more details.
-
 """
 
 __title__ = "driz"

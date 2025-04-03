@@ -1,3 +1,14 @@
+"""
+driz.query
+~~~~~~~~~~~~~~~~~~~~~
+
+A module containing functions for building SQL-like query conditions.
+
+:copyright: (c) 2025-present Sougata Jana
+:license: MIT, see LICENSE for more details.
+"""
+
+
 from typing import Any, Union
 
 __all__ = [
@@ -19,11 +30,6 @@ __all__ = [
 ]
 
 def negate(condition: str) -> str:
-    """
-    Negates a condition.
-    :param condition:  The condition to negate.
-    :return:  A string representing the negated condition.
-    """
     return f"NOT {condition}"
 
 def both(c1: str, c2: str) -> str:
