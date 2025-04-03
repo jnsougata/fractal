@@ -69,7 +69,7 @@ class DB:
             schema (Schema): The schema of the table.
         """
         fields = ", ".join(
-            f"{field.name} {field.sql_type} {' '.join(field.constraints)}"
+            f"{field.name} {field.sql_type} {field.constraints}"
             for field in schema.fields
         )
         sql = f"CREATE TABLE IF NOT EXISTS {schema.collection} ({fields})"

@@ -17,26 +17,39 @@ pip install git+https://github.com/jnsougata/driz.git
 ```python
 import driz
 
-db = driz.DB("example.db")
-users = db.collection(
-    "users",
-    schema=driz.Schema(
-        driz.Field("id", int, "PRIMARY KEY"),
-        driz.Field("name", str, "NOT NULL"),
-        driz.Field("age", int, "NOT NULL"),
-        driz.Field("email", str, "UNIQUE"),
-        driz.Field("is_active", bool, "DEFAULT 1"),
-    ))
-users.insert(
-    id=1,
-    name="John Doe",
-    age=30,
-    email="doe@example.com",
-    is_active=True,
-)
-for user in users.all():
-    print(user)
-users.delete(1)
+
+def main():
+    db = driz.DB("example.db")
+    users = db.collection(
+        "users",
+        schema=driz.Schema(
+                driz.Field("name", str, nullable=False),
+                driz.Field("age", int, nullable=False),
+                driz.Field("email", str),
+                driz.Field("active", bool, default=True),
+        )
+    )
+    posts = db.collection(
+        "posts",
+        schema=driz.Schema(
+            driz.Field("user_id", str, ref_collection="users", ref_field="key"),
+            driz.Field("content", str, nullable=False))
+    )
+    user_id = users.insert(
+        name="Sougata Jana",
+        age=25,
+        email="abc@xyz.com",
+        active=True,
+    )
+    print(f"Inserted user with ID: {user_id}")
+    posts.insert(
+        user_id=user_id,
+        content="This is a test post.",
+    )
+
+
+if __name__ == "__main__":
+    main()
 ```
 
 ## Documentation

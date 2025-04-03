@@ -1,5 +1,7 @@
 import sqlite3
 from typing import Optional, Union, Dict, Any, List
+import uuid
+import datetime
 
 from .errors import FieldNotFound
 from .schema import Schema, as_sql_type
@@ -57,15 +59,17 @@ class Collection:
         self.connection.commit()
         return True
 
-    def insert(self, **data):
+    def insert(self, **data) -> str:
         """
         Insert a record into the collection.
 
         Args:
             **data: The data to insert into the collection.
         Returns:
-            int: The key of the inserted record.
+            str: The key of the inserted record.
         """
+        data["key"] = uuid.uuid4().hex
+        data["timestamp"] = datetime.datetime.now()
         if len(data) != len(self.schema.fields):
             raise ValueError("Data length does not match schema fields length.")
         for field in self.schema.fields:
@@ -80,7 +84,7 @@ class Collection:
         sql = f"INSERT INTO {self.name} ({columns}) VALUES ({placeholders})"
         self.cursor.execute(sql, values)
         self.connection.commit()
-        return self.cursor.lastrowid
+        return data["key"]
 
     def delete(self, key: Union[int, str]):
         """
@@ -89,7 +93,7 @@ class Collection:
         Args:
             key (Union[int, str]): The key of the record to delete.
         """
-        self.cursor.execute(f"DELETE FROM {self.name} WHERE id = ?", (key,))
+        self.cursor.execute(f"DELETE FROM {self.name} WHERE key = ?", (key,))
         self.connection.commit()
 
     def remove_field(self, field: str):
@@ -111,7 +115,7 @@ class Collection:
         """
         Fetch all records from the collection.
         """
-        self.cursor.execute(f"SELECT * FROM {self.name} WHERE id = ?", (key,))
+        self.cursor.execute(f"SELECT * FROM {self.name} WHERE key = ?", (key,))
         data = self.cursor.fetchone()
         if data is None:
             return None
