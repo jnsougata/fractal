@@ -30,14 +30,19 @@ class Collection:
         self.cursor.execute(f"TRUNCATE TABLE {self.name}")
         self.connection.commit()
 
-    def drop(self, confirm: bool = False):
+    def drop(self, confirm: bool = False) -> bool:
         """
         Drops the collection from the database.
+        Args:
+            confirm (bool): If True, the collection will be dropped. Otherwise, it will not be dropped.
+        Returns:
+            bool: True if the collection was dropped, False otherwise.
         """
         if not confirm:
-            raise RuntimeWarning("Are you sure you want to drop this table? Use confirm=True to proceed.")
+            return False
         self.cursor.execute(f"DROP TABLE IF EXISTS {self.name}")
         self.connection.commit()
+        return True
 
     def insert(self, **data):
         """
