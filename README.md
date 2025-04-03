@@ -53,7 +53,6 @@ if __name__ == "__main__":
 ```
 
 ## Documentation
-Coming soon! For now, refer to the code comments and examples or source dive.
 Half-baked docs [here.](https://driz.readthedocs.io/en/latest/)
 
 ## TODO
