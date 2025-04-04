@@ -45,6 +45,9 @@ def main():
         
     )
     print(success)
+    
+    query = users.query("active").startswith("name", "R").lt("age", 30)
+    print(query.exec())
 
 if __name__ == "__main__":
     main()

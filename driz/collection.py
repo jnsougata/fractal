@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Union
 
 from .errors import FieldNotFound
 from .schema import Schema, as_sql_type
-from .query import _Select
+from .query import _Where, _Select
 
 
 class Collection:
@@ -275,19 +275,19 @@ class Collection:
 
     def query(
         self,
-        *fields: str,
+        *picks: str,
         limit: int = 0,
         distinct: bool = False,
-    ) -> _Select:
+    ) -> _Where:
         """
         Create a new WHERE clause for the collection.
 
         Args:
-            *fields (tuple(str)): The fields to select.
+            *picks (tuple(str)): The fields to pick from the records matching the WHERE clause.
             limit (int): The maximum number of records to return. Default is 0 (no limit).
             distinct (bool): If True, the SELECT statement will be distinct. Default is False.
         """
-        return _Select(*fields, source=self, distinct=distinct, limit=limit)
+        return _Select(*picks, source=self, distinct=distinct, limit=limit).where
 
     def update(self, key: str, **data: Any):
         """

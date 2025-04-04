@@ -13,7 +13,7 @@ from typing import Any, Union, TYPE_CHECKING, Dict, List
 if TYPE_CHECKING:
     from .collection import Collection
 
-__all__ = ["_Select"]
+__all__ = ["_Select", "_Where"]
 
 class _Where:
     """
@@ -21,16 +21,17 @@ class _Where:
     """
 
     def __init__(
-            self, select_clause: str,
-            ored: bool = False,
-            source: "Collection" = None,
-            limit: int = 0,
+        self,
+        select: "_Select",
+        ored: bool = False,
+        source: "Collection" = None,
+        limit: int = 0,
     ):
         self.limit = limit
         self.source = source
         self.condition = ""
         self.ored = ored
-        self.select_clause = select_clause
+        self.select = select
 
     def _join(self, condition: str):
         if self.ored:
@@ -107,12 +108,12 @@ class _Where:
         self._join(f"{field} LIKE '%{value}%'")
         return self
 
-    def run(self) -> List[Dict[str, Any]]:
+    def exec(self) -> List[Dict[str, Any]]:
         """
         Executes the WHERE clause and returns the results.
         """
         if self.condition:
-            sql = (self.select_clause + " WHERE " + self.condition).strip(" AND").strip(" OR")
+            sql = (self.select.sql + " WHERE " + self.condition).strip(" AND").strip(" OR")
 
         else:
             sql = self.source.cursor.execute(f"SELECT * FROM {self.source.name}")
@@ -157,4 +158,4 @@ class _Select:
         """
         Set the source collection for the SELECT statement.
         """
-        return _Where(self.sql, ored=self.ored, source=self.source, limit=self.limit)
+        return _Where(self, ored=self.ored, source=self.source, limit=self.limit)
