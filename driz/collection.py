@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Union
 
 from .errors import FieldNotFound
 from .schema import Schema, as_sql_type
+from .query import _Select
 
 
 class Collection:
@@ -272,22 +273,21 @@ class Collection:
         self.cursor.execute(f"SELECT COUNT(*) FROM {self.name}")
         return self.cursor.fetchone()[0]
 
-    def where(self, *conditions: str) -> List[Dict[str, Any]]:
+    def query(
+        self,
+        *fields: str,
+        limit: int = 0,
+        distinct: bool = False,
+    ) -> _Select:
         """
-        Execute a custom database query with conditions.
+        Create a new WHERE clause for the collection.
 
         Args:
-            *conditions (str): The conditions to apply to the query.
-
-        Returns:
-            List[Dict[str, Any]]: A list of dictionaries representing the records that match the conditions.
+            *fields (tuple(str)): The fields to select.
+            limit (int): The maximum number of records to return. Default is 0 (no limit).
+            distinct (bool): If True, the SELECT statement will be distinct. Default is False.
         """
-        conditions = ", ".join(conditions)
-        self.cursor.execute(f"SELECT * FROM {self.name} WHERE {conditions};")
-        return [
-            dict(zip([column[0] for column in self.cursor.description], row))
-            for row in self.cursor.fetchall()
-        ]
+        return _Select(*fields, source=self, distinct=distinct, limit=limit)
 
     def update(self, key: str, **data: Any):
         """
@@ -300,7 +300,7 @@ class Collection:
         for name, value in data.items():
             if not self.schema.fields.items().get(name):
                 raise ValueError(f"Invalid field: {name}")
-            if as_sql_type(type(value)) != self.schema.resolve_field_type(k):
+            if as_sql_type(type(value)) != self.schema.resolve_field_type(value):
                 raise TypeError(f"Incorrect type for field: {name}")
         placeholders = ", ".join(f"{k} = ?" for k in data.keys())
         args = tuple(data.values()) + (key,)

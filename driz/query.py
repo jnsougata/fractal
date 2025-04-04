@@ -8,109 +8,153 @@ A module containing functions for building SQL-like query conditions.
 :license: MIT, see LICENSE for more details.
 """
 
-from typing import Any, Union
+from typing import Any, Union, TYPE_CHECKING, Dict, List
 
-__all__ = [
-    "negate",
-    "both",
-    "either",
-    "contains",
-    "startswith",
-    "endswith",
-    "equals",
-    "anyof",
-    "noneof",
-    "between",
-    "isnull",
-    "gt",
-    "gte",
-    "lt",
-    "lte",
-]
+if TYPE_CHECKING:
+    from .collection import Collection
 
+__all__ = ["_Select"]
 
-def negate(condition: str) -> str:
-    return f"NOT {condition}"
+class _Where:
+    """
+    A class representing a SQL WHERE clause.
+    """
 
+    def __init__(
+            self, select_clause: str,
+            ored: bool = False,
+            source: "Collection" = None,
+            limit: int = 0,
+    ):
+        self.limit = limit
+        self.source = source
+        self.condition = ""
+        self.ored = ored
+        self.select_clause = select_clause
 
-def both(c1: str, c2: str) -> str:
-    return f"{c1} AND {c2}"
-
-
-def either(c1: str, c2: str) -> str:
-    return f"{c1} OR {c2}"
-
-
-def contains(field: str, value: str) -> str:
-    return f"{field} LIKE '%{value}%'"
-
-
-def startswith(field: str, prefix: str) -> str:
-    return f"{field} LIKE '{prefix}%'"
-
-
-def endswith(field: str, suffix: str) -> str:
-    return f"{field} LIKE '%{suffix}'"
-
-
-def equals(field: str, value) -> str:
-    if isinstance(value, (int, float)):
-        return f"{field} = {value}"
-    return f"{field} LIKE '{value}'"
-
-
-def anyof(field: str, *values: Any) -> str:
-    v = []
-    for value in values:
-        if isinstance(value, str):
-            v.append(f"'{value}'")
+    def _join(self, condition: str):
+        if self.ored:
+            self.condition += f"{condition} OR "
         else:
-            v.append(str(value))
-    values_str = ", ".join(f"'{str(value)}'" for value in values)
-    return f"{field} IN ({values_str})"
+            self.condition += f"{condition} AND "
 
-
-def noneof(field: str, *values: Any) -> str:
-    v = []
-    for value in values:
-        if isinstance(value, str):
-            v.append(f"'{value}'")
+    def equals(self, field: str, value: Any):
+        if isinstance(value, (int, float)):
+            self._join(f"{field} = {value}")
         else:
-            v.append(str(value))
-    values_str = ", ".join(f"{str(value)}" for value in v)
-    return f"{field} NOT IN ({values_str})"
+            self._join(f"{field} LIKE '{value}'")
+        return self
 
+    def negate(self, condition: str):
+        self._join(condition)
+        return self
 
-def between(field: str, start: Union[int, float], end: Union[int, float]) -> str:
-    return f"{field} BETWEEN {start} AND {end}"
+    def anyof(self, field: str, *values: Any):
+        v = []
+        for value in values:
+            if isinstance(value, str):
+                v.append(f"'{value}'")
+            else:
+                v.append(str(value))
+        values_str = ", ".join(v)
+        self.condition += self._join(f"{field} IN ({values_str})")
+        return self
 
+    def noneof(self, field: str, *values: Any):
+        v = []
+        for value in values:
+            if isinstance(value, str):
+                v.append(f"'{value}'")
+            else:
+                v.append(str(value))
+        values_str = ", ".join(v)
+        self._join(f"{field} NOT IN ({values_str})")
+        return self
 
-def isnull(field: str) -> str:
-    return f"{field} IS NULL"
+    def between(self, field: str, start: Union[int, float], end: Union[int, float]):
+        self._join(f"{field} BETWEEN {start} AND {end}")
+        return self
 
+    def isnull(self, field: str):
+        self._join(f"{field} IS NULL")
+        return self
 
-def gt(field: str, value: Union[int, float]) -> str:
-    return f"{field} > {value}"
+    def gt(self, field: str, value: Union[int, float]):
+        self._join(f"{field} > {value}")
+        return self
 
+    def gte(self, field: str, value: Union[int, float]):
+        self._join(f"{field} >= {value}")
+        return self
 
-def gte(field: str, value: Union[int, float]) -> str:
-    return f"{field} >= {value}"
+    def lt(self, field: str, value: Union[int, float]):
+        self._join(f"{field} < {value}")
+        return self
 
+    def lte(self, field: str, value: Union[int, float]):
+        self._join(f"{field} <= {value}")
+        return self
 
-def lt(field: str, value: Union[int, float]) -> str:
-    return f"{field} < {value}"
+    def startswith(self, field: str, prefix: str):
+        self._join(f"{field} LIKE '{prefix}%'")
+        return self
 
+    def endswith(self, field: str, suffix: str):
+        self._join(f"{field} LIKE '%{suffix}'")
+        return self
 
-def lte(field: str, value: Union[int, float]) -> str:
-    return f"{field} <= {value}"
+    def substring(self, field: str, value: str):
+        self._join(f"{field} LIKE '%{value}%'")
+        return self
 
+    def run(self) -> List[Dict[str, Any]]:
+        """
+        Executes the WHERE clause and returns the results.
+        """
+        if self.condition:
+            sql = (self.select_clause + " WHERE " + self.condition).strip(" AND").strip(" OR")
 
-if __name__ == "__main__":
-    print(startswith("name", "John"))  # Output: name LIKE 'John%'
-    print(endswith("name", "Doe"))  # Output: name LIKE '%Doe'
-    print(contains("name", "John"))  # Output: name LIKE '%John%'
-    print(equals("name", "John Doe"))  # Output: name = 'John Doe'
-    print(
-        anyof("name", "John Doe", "Jane Doe")
-    )  # Output: name IN ('John Doe', 'Jane Doe')
-    print(between("age", 18, 30))  # Output: age BETWEEN '18' AND '30'
+        else:
+            sql = self.source.cursor.execute(f"SELECT * FROM {self.source.name}")
+        if self.limit:
+            sql += f" LIMIT {self.limit}"
+        self.source.cursor.execute(sql)
+        return [
+            dict(zip([column[0] for column in self.source.cursor.description], row))
+            for row in self.source.cursor.fetchall()
+        ]
+
+class _Select:
+    """
+    A class representing a SQL SELECT statement.
+    """
+
+    def __init__(
+        self,
+        *fields: str,
+        source: "Collection",
+        distinct: bool = False,
+        ored: bool = False,
+        limit: int = 0,
+    ):
+        self.source = source
+        self.ored = ored
+        self.sql = ""
+        self.limit = limit
+        if distinct:
+            self.sql = "SELECT DISTINCT"
+            if len(fields) > 0:
+                self.sql += f" {', '.join(fields)} "
+        elif len(fields) == 0:
+            self.sql = "SELECT *"
+        else:
+            self.sql = f"SELECT {', '.join(fields)}"
+
+        self .sql += f" FROM {source.name}"
+
+    @property
+    def where(self) -> _Where:
+        """
+        Set the source collection for the SELECT statement.
+        """
+        return _Where(self.sql, ored=self.ored, source=self.source, limit=self.limit)

@@ -29,24 +29,22 @@ def main():
                 driz.Field("active", bool, default=True),
         )
     )
-    posts = db.collection(
-        "posts",
-        schema=driz.Schema(
-            driz.Field("user_id", str, ref_collection="users", ref_field="key"),
-            driz.Field("content", str, nullable=False))
+    success = users.insert(
+        {
+            "name": "Sougata Jana",
+            "age": 25,
+            "email": "abc@xyz.com",
+            "active": True,
+        },
+        {
+            "name": "Rajibul Molla",
+            "age": 22,
+            "email": "abc@xyz.com",
+            "active": True,
+        }
+        
     )
-    user_id = users.insert(
-        name="Sougata Jana",
-        age=25,
-        email="abc@xyz.com",
-        active=True,
-    )
-    print(f"Inserted user with ID: {user_id}")
-    posts.insert(
-        user_id=user_id,
-        content="This is a test post.",
-    )
-
+    print(success)
 
 if __name__ == "__main__":
     main()
