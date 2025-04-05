@@ -13,9 +13,9 @@ from typing import Any, Union, TYPE_CHECKING, Dict, List
 if TYPE_CHECKING:
     from .collection import Collection
 
-__all__ = ["_Select", "_Where"]
+__all__ = ["_Select", "Where"]
 
-class _Where:
+class Where:
     """
     A class representing a SQL WHERE clause.
     """
@@ -154,8 +154,8 @@ class _Select:
         self .sql += f" FROM {source.name}"
 
     @property
-    def where(self) -> _Where:
+    def where(self) -> Where:
         """
         Set the source collection for the SELECT statement.
         """
-        return _Where(self, ored=self.ored, source=self.source, limit=self.limit)
+        return Where(self, ored=self.ored, source=self.source, limit=self.limit)

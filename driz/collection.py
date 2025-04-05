@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Union
 
 from .errors import FieldNotFound
 from .schema import Schema, as_sql_type
-from .query import _Where, _Select
+from .query import Where, _Select
 
 
 class Collection:
@@ -278,7 +278,7 @@ class Collection:
         *picks: str,
         limit: int = 0,
         distinct: bool = False,
-    ) -> _Where:
+    ) -> Where:
         """
         Create a new WHERE clause for the collection.
 
