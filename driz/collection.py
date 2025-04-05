@@ -85,8 +85,8 @@ class Collection:
                     raise TypeError(f"Incorrect type for field: {k}")
             batch.append(tuple(record[f] for f in fields))
         columns = ", ".join(fields)
-        sql = f"INSERT INTO {self.name} ({columns}) VALUES ({", ".join("?" * len(fields))})"
-        self.cursor.executemany(sql, batch)
+        template = ", ".join("?" * len(fields))
+        self.cursor.executemany(f"INSERT INTO {self.name} ({columns}) VALUES ({template})", batch)
         self.connection.commit()
         return {record["key"]: record for record in records}
 
