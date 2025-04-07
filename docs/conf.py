@@ -4,12 +4,12 @@ import sys
 
 sys.path.insert(0, os.path.abspath(".."))
 
-project = "driz"
+project = "fractal"
 copyright = "2025-present, Sougata Jana"
 author = "Sougata Jana"
 
 version = ""
-with open("../driz/__init__.py") as f:
+with open("../fractal/__init__.py") as f:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)  # type: ignore
 
 release = version

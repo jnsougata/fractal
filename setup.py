@@ -5,12 +5,12 @@ with open("README.md") as f:
 
 
 setup(
-    name="driz",
+    name="fractal",
     version="0.0.1",
     description="A lightweight, simple, and fast SQLite wrapper for Python.",
     long_description=readme,
     long_description_content_type="text/markdown",
-    url="https://github.com/jnsougata/driz",
+    url="https://github.com/jnsougata/fractal",
     author="Sougata Jana",
     author_email="jnsougata@gmail.com",
     classifiers=[
@@ -26,7 +26,7 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Utilities",
     ],
-    packages=["driz"],
-    keywords="sqlite, wrapper, database, lightweight",
+    packages=["fractal"],
+    keywords="sqlite, wrapper, database, lightweight, sqlite3, KV, storage",
     python_requires=">=3.8.0",
 )

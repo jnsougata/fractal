@@ -1,5 +1,5 @@
 """
-driz
+FractalDB
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A fast lightweight k-v storage for hobbyists.
@@ -8,7 +8,7 @@ A fast lightweight k-v storage for hobbyists.
 :license: MIT, see LICENSE for more details.
 """
 
-__title__ = "driz"
+__title__ = "fractal"
 __license__ = "MIT"
 __copyright__ = "Copyright 2025-present Sougata Jana"
 __author__ = "Sougata Jana"

@@ -1,26 +1,26 @@
-.. autoclass:: driz.DB
+.. autoclass:: fractal.DB
     :members:
     :undoc-members:
     :show-inheritance:
 
 
-.. autoclass:: driz.Field
+.. autoclass:: fractal.Field
     :members:
     :undoc-members:
     :show-inheritance:
 
 
-.. autoclass:: driz.Schema
+.. autoclass:: fractal.Schema
     :members:
     :undoc-members:
     :show-inheritance:
 
-.. automodule:: driz.query
+.. automodule:: fractal.query
     :members:
     :undoc-members:
     :show-inheritance:
 
-.. automodule:: driz.errors
+.. automodule:: fractal.errors
     :members:
     :undoc-members:
     :show-inheritance:

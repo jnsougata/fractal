@@ -15,18 +15,18 @@ pip install git+https://github.com/jnsougata/driz.git
 ## Example Usage
 
 ```python
-import driz
+import fractal
 
 
 def main():
-    db = driz.DB("example.db")
+    db = fractal.DB("example.db")
     users = db.collection(
         "users",
-        schema=driz.Schema(
-                driz.Field("name", str, nullable=False),
-                driz.Field("age", int, nullable=False),
-                driz.Field("email", str),
-                driz.Field("active", bool, default=True),
+        schema=fractal.Schema(
+            fractal.Field("name", str, nullable=False),
+            fractal.Field("age", int, nullable=False),
+            fractal.Field("email", str),
+            fractal.Field("active", bool, default=True),
         )
     )
     success = users.insert(
@@ -42,12 +42,13 @@ def main():
             "email": "abc@xyz.com",
             "active": True,
         }
-        
+
     )
     print(success)
-    
+
     query = users.query("active").startswith("name", "R").lt("age", 30)
     print(query.exec())
+
 
 if __name__ == "__main__":
     main()
