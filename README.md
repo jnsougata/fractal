@@ -55,7 +55,7 @@ if __name__ == "__main__":
 ```
 
 ## Documentation
-Half-baked docs [here.](https://driz.readthedocs.io/en/latest/)
+Half-baked docs [here.](https://fractal.readthedocs.io/en/latest/)
 
 ## TODO
 - Add more SQL features (e.g., `JOIN`, `GROUP BY`).
