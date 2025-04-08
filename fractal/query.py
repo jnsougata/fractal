@@ -35,12 +35,13 @@ class _Select:
             self.sql = "SELECT DISTINCT"
             if len(fields) > 0:
                 self.sql += f" {', '.join(fields)} "
-        elif len(fields) == 0:
-            self.sql = "SELECT *"
-        else:
+            else:
+                self.sql += " * "
+        elif len(fields) > 0:
             self.sql = f"SELECT {', '.join(fields)}"
-
-        self .sql += f" FROM {source.name}"
+        else:
+            self.sql = "SELECT *"
+        self.sql += f" FROM {self.source.name}"
 
     def where(self, condition: Condition) -> List[Dict[str, Any]]:
         """
