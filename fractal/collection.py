@@ -70,25 +70,13 @@ class Collection:
             Dict[str, Any]: The inserted data with the key and timestamp.
         """
         now = datetime.datetime.now()
-        fields = records[0].keys()
-        batch = []
         for record in records:
             record["key"] = uuid.uuid4().hex
             record["timestamp"] = now
-        for record in records:
-            if len(record) != len(self.schema.fields):
-                raise ValueError("Data length does not match schema fields length.")
-            for k, v in record.items():
-                if not self.schema.fields.get(k):
-                    raise ValueError(f"Invalid field: {k}")
-                if as_sql_type(type(v)) != self.schema.resolve_field_type(k):
-                    raise TypeError(f"Incorrect type for field: {k}")
-            batch.append(tuple(record[f] for f in fields))
-        columns = ", ".join(fields)
-        template = ", ".join("?" * len(fields))
-        self.cursor.executemany(
-            f"INSERT INTO {self.name} ({columns}) VALUES ({template})", batch
-        )
+            fields = record.keys()
+            columns = ", ".join(fields)
+            template = ", ".join("?" * len(fields))
+            self.cursor.execute(f"INSERT INTO {self.name} ({columns}) VALUES ({template})", list(record.values()))
         self.connection.commit()
         return {record["key"]: record for record in records}
 

@@ -74,7 +74,7 @@ class Condition:
     def substring(self, other):
         self.clause = f"{self.field} LIKE ?"
         self.values = [f"%{other}%"]
-        return self.clause, self.values
+        return Condition(self.field, self.clause, self.values)
 
     def anyof(self, *values):
         self.clause = f"{self.field} IN ({', '.join("?" * len(values))})"

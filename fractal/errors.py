@@ -2,7 +2,7 @@
 fractal.errors
 ~~~~~~~~~~~~~~~~~~~~~
 
-A module containing custom exceptions for the Driz database library.
+A module containing custom exceptions for the Fractal database library.
 
 :copyright: (c) 2025-present Sougata Jana
 :license: MIT, see LICENSE for more details.

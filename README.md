@@ -16,44 +16,37 @@ pip install git+https://github.com/jnsougata/fractal.git
 ## Example Usage
 
 ```python
-import fractal
+from fractal import cond, DB, Schema, Field
 
 
-def main():
-    db = fractal.DB("example.db")
-    users = db.collection(
-        "users",
-        schema=fractal.Schema(
-            fractal.Field("name", str, nullable=False),
-            fractal.Field("age", int, nullable=False),
-            fractal.Field("email", str),
-            fractal.Field("active", bool, default=True),
-        )
-    )
-    record = users.insert(
-        {
-            "name": "Sougata Jana",
-            "age": 25,
-            "email": "abc@xyz.com",
-            "active": True,
-        },
-        {
-            "name": "Rajibul Molla",
-            "age": 22,
-            "email": "abc@xyz.com",
-            "active": True,
-        }
-
-    )
-    print(record)
-    records = users.query(limit=1).where(fractal.cond("age").between(22, 25))
-    print(records)
-    
-    db.close()
-
-    
 if __name__ == "__main__":
-    main()
+    
+    db = DB("example.db")
+    
+    users = db.collection(
+        name="users",
+        schema=Schema(Field("name", str), Field("age", int))
+    )
+    
+    inserted = users.insert(
+        {"name": "Alice", "age": 25},
+        {"name": "Bob", "age": 30},
+        {"name": "Charlie", "age": 35},
+        {"name": "David", "age": 40},
+    )
+    
+    c1 = cond("name").anyof("Alice", "Bob") & cond("age").between(20, 40)
+    c2 = cond("age").between(20, 30) & cond("name").substring("li")
+
+    users = users.query(limit=2).where(c1 | c2)  # ORed conditions
+    for user in users:
+        print(user)
+```
+
+#### Sample Output:
+```
+{'key': '379b87afd3d74f49bc1c59b8185bb534', 'timestamp': '2025-04-08 16:25:13.012322', 'name': 'Alice', 'age': 25}
+{'key': '15676bf56c524e5b87db4ee0a659efc7', 'timestamp': '2025-04-08 16:25:13.012322', 'name': 'Bob', 'age': 30}
 ```
 
 ## Documentation
