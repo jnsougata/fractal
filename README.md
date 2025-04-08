@@ -35,10 +35,10 @@ if __name__ == "__main__":
         {"name": "David", "age": 40},
     )
     
-    c1 = cond("name").anyof("Alice", "Bob") & cond("age").between(20, 40)
-    c2 = cond("age").between(20, 30) & cond("name").substring("li")
+    c1 = cond("name").anyof("Alice", "Bob") and cond("age").between(20, 40)
+    c2 = cond("age").between(20, 30) and cond("name").substring("li")
 
-    users = users.query(limit=2).where(c1 | c2)  # ORed conditions
+    users = users.query().where(c1 or c2)
     for user in users:
         print(user)
 ```

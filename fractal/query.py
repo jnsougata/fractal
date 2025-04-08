@@ -17,12 +17,29 @@ __all__ = ["_Select", "cond", "Condition"]
 
 
 class Condition:
+    """
+    A class representing a condition for SQL queries.
+
+    Args:
+        field (str): The name of the field.
+        clause (str): The SQL clause for the condition.
+        values (Any): The values for the condition.
+    """
     def __init__(self, field: str, clause: str = None, values: Optional[Any] = None):
         self.field = field
         self.clause = clause
         self.values = values
 
     def __eq__(self, other):
+        """
+        Check if the value of the field in collection is equal to the given value.
+
+        Args:
+            other (int | float | str | None | datetime | bytes): The value to compare with.
+
+        Returns:
+            Condition: A condition object with the field, clause, and values.
+        """
         if other is None:
             self.clause = f"{self.field} IS NULL"
             self.values = []
@@ -32,7 +49,15 @@ class Condition:
         return Condition(self.field, self.clause, self.values)
 
     def __ne__(self, other):
+        """
+        Check if the value of the field in collection is not equal to the given value.
 
+        Args:
+            other (int | float | str | None | datetime | bytes): The value to compare with.
+
+        Returns:
+            Condition: A condition object with the field, clause, and values.
+        """
         if other is None:
             self.clause = f"{self.field} IS NOT NULL"
             return self.clause, []
@@ -42,16 +67,40 @@ class Condition:
             return Condition(self.field, self.clause, self.values)
 
     def __lt__(self, other):
+        """
+        Check if the value of the field in collection is less than the given value.
+
+        Args:
+            other (int | float | str | None | datetime | bytes): The value to compare with.
+        """
         self.clause = f"{self.field} < ?"
         self.values = [other]
         return Condition(self.field, self.clause, self.values)
 
     def __le__(self, other):
+        """
+        Check if the value of the field in collection is less than or equal to the given value.
+
+        Args:
+            other (int | float | str | None | datetime | bytes): The value to compare with.
+
+        Returns:
+            Condition: A condition object with the field, clause, and values.
+        """
         self.clause = f"{self.field} <= ?"
         self.values = [other]
         return Condition(self.field, self.clause, self.values)
 
     def __gt__(self, other):
+        """
+        Check if the value of the field in collection is greater than the given value.
+
+        Args:
+            other (int | float | str | None | datetime | bytes): The value to compare with.
+
+        Returns:
+            Condition: A condition object with the field, clause, and values.
+        """
         self.clause = f"{self.field} > ?"
         self.values = [other]
         return Condition(self.field, self.clause, self.values)
@@ -61,53 +110,135 @@ class Condition:
         self.values = [other]
         return Condition(self.field, self.clause, self.values)
 
-    def startswith(self, other):
+    def startswith(self, prefix: str):
+        """
+        Check if the value of the field in collection starts with the given value.
+
+        Args:
+            prefix (str): The value to compare with.
+
+        Returns:
+            Condition: A condition object with the field, clause, and values.
+        """
         self.clause = f"{self.field} LIKE ?"
-        self.values = [f"{other}%"]
+        self.values = [f"{prefix}%"]
         return Condition(self.field, self.clause, self.values)
 
-    def endswith(self, other):
+    def endswith(self, suffix: str):
+        """
+        Check if the value of the field in collection ends with the given value.
+
+        Args:
+            suffix (str): The value to compare with.
+
+        Returns:
+            Condition: A condition object with the field, clause, and values.
+        """
         self.clause = f"{self.field} LIKE ?"
-        self.values = [f"%{other}"]
+        self.values = [f"%{suffix}"]
         return Condition(self.field, self.clause, self.values)
 
-    def substring(self, other):
+    def substring(self, infix: str):
+        """
+        Check if the value of the field in collection contains the given substring.
+
+        Args:
+            infix (str): The substring to check for.
+
+        Returns:
+            Condition: A condition object with the field, clause, and values.
+        """
         self.clause = f"{self.field} LIKE ?"
-        self.values = [f"%{other}%"]
+        self.values = [f"%{infix}%"]
         return Condition(self.field, self.clause, self.values)
 
     def anyof(self, *values):
+        """
+        Check if the value of the field in collection is any of the given values.
+
+        Args:
+            *values: The values to check for.
+
+        Returns:
+            Condition: A condition object with the field, clause, and values.
+        """
         self.clause = f"{self.field} IN ({', '.join("?" * len(values))})"
         self.values = list(values)
         return Condition(self.field, self.clause, self.values)
 
     def noneof(self, *values):
+        """
+        Check if the value of the field in collection is none of the given values.
+
+        Args:
+            *values: The values to check for.
+
+        Returns:
+            Condition: A condition object with the field, clause, and values.
+        """
         self.clause = f"{self.field} NOT IN ({', '.join('?' * len(values))})"
         self.values = list(values)
         return Condition(self.field, self.clause, self.values)
 
     def between(self, start, end):
+        """
+        Check if the value of the field in collection is between the given start and end values.
+
+        Args:
+            start (int | float): The start value.
+            end (int | float): The end value.
+
+        Returns:
+            Condition: A condition object with the field, clause, and values.
+        """
         self.clause = f"{self.field} BETWEEN ? AND ?"
         self.values = [start, end]
         return Condition(self.field, self.clause, self.values)
 
     def isnull(self):
+        """
+        Check if the value of the field in collection is null.
+
+        Returns:
+             Condition: A condition object with the field, clause, and values.
+        """
         self.clause = f"{self.field} IS NULL"
         self.values = []
         return Condition(self.field, self.clause, self.values)
 
     def notnull(self):
+        """
+        Check if the value of the field in collection is not null.
+        """
         self.clause = f"{self.field} IS NOT NULL"
         self.values = []
         return Condition(self.field, self.clause, self.values)
 
     def __and__(self, other):
+        """
+        Combines two conditions with an AND operator.
+
+        Args:
+            other (Condition): The other condition to combine with.
+
+        Returns:
+            Condition: A new condition object with the combined field, clause, and values.
+        """
         self.field = f"{self.field}&{other.field}"
         combined = f"({self.clause} AND {other.clause})"
         combined_values = self.values + other.values
         return Condition(self.field, combined, combined_values)
 
     def __or__(self, other):
+        """
+        Combines two conditions with an OR operator.
+
+        Args:
+            other (Condition): The other condition to combine with.
+
+        Returns:
+            Condition: A new condition object with the combined field, clause, and values.
+        """
         self.field = f"{self.field}|{other.field}"
         combined = f"({self.clause} OR {other.clause})"
         combined_values = self.values + other.values
