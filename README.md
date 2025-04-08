@@ -30,7 +30,7 @@ def main():
             fractal.Field("active", bool, default=True),
         )
     )
-    success = users.insert(
+    record = users.insert(
         {
             "name": "Sougata Jana",
             "age": 25,
@@ -45,12 +45,13 @@ def main():
         }
 
     )
-    print(success)
+    print(record)
+    records = users.query(limit=1).where(fractal.cond("age").between(22, 25))
+    print(records)
+    
+    db.close()
 
-    query = users.query("active").startswith("name", "R").lt("age", 30)
-    print(query.exec())
-
-
+    
 if __name__ == "__main__":
     main()
 ```
