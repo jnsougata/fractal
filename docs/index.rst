@@ -1,19 +1,4 @@
-.. autoclass:: fractal
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: fractal.query
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: fractal.schema
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: fractal.errors
+.. automodule:: fractal
     :members:
     :undoc-members:
     :show-inheritance:
