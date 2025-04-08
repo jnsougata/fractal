@@ -4,7 +4,6 @@ from typing import Any, Dict, Optional, Tuple
 from .converter import as_sql_type
 from .errors import FieldNotFound
 
-
 __all__ = ["Field", "Schema"]
 
 

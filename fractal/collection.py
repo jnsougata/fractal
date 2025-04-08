@@ -76,7 +76,10 @@ class Collection:
             fields = record.keys()
             columns = ", ".join(fields)
             template = ", ".join("?" * len(fields))
-            self.cursor.execute(f"INSERT INTO {self.name} ({columns}) VALUES ({template})", list(record.values()))
+            self.cursor.execute(
+                f"INSERT INTO {self.name} ({columns}) VALUES ({template})",
+                list(record.values()),
+            )
         self.connection.commit()
         return {record["key"]: record for record in records}
 
@@ -289,5 +292,7 @@ class Collection:
         """
         placeholders = ", ".join(f"{k} = ?" for k in data.keys())
         args = tuple(data.values()) + (key,)
-        self.cursor.execute(f"UPDATE {self.name} SET {placeholders} WHERE key = ?", args)
+        self.cursor.execute(
+            f"UPDATE {self.name} SET {placeholders} WHERE key = ?", args
+        )
         self.connection.commit()
