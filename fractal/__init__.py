@@ -20,16 +20,3 @@ from .converter import *
 from .kvclient import KVStore
 from .query import *
 from .schema import *
-
-__all__ = [
-    "__title__",
-    "__license__",
-    "__copyright__",
-    "__author__",
-    "__version__",
-    "DB",
-    "KVStore",
-    "Schema",
-    "Field",
-    "cond",
-]
