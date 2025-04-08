@@ -10,7 +10,7 @@ A fast, lightweight key-value store designed for hobbyists, combining the simpli
 
 ## Installation
 ```sh
-pip install git+https://github.com/jnsougata/driz.git
+pip install git+https://github.com/jnsougata/fractal.git
 ```
 
 ## Example Usage

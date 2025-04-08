@@ -19,3 +19,4 @@ from .client import DB
 from .converter import *
 from .query import *
 from .schema import Field, Schema
+from .kvclient import KVStore
