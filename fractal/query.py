@@ -8,13 +8,15 @@ A module containing functions for building SQL-like query conditions.
 :license: MIT, see LICENSE for more details.
 """
 
-from typing import Any, Union, TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List, Union
+
 from .schema import Condition
 
 if TYPE_CHECKING:
     from .collection import Collection
 
 __all__ = ["_Select"]
+
 
 class _Select:
     """

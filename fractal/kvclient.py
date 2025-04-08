@@ -1,20 +1,18 @@
-import sqlite3
 import json
-from typing import Any, Optional, Dict
-
+import sqlite3
 import warnings
+from typing import Any, Dict, Optional
 
 
 class Page:
     def __init__(self, name: str, conn: sqlite3.Connection):
         self.name = name
-        self.conn =  conn
+        self.conn = conn
 
     def put(self, **data: Any) -> int:
         """Unconditionally inserts JSON data and returns the inserted row ID."""
         cur = self.conn.execute(
-            f"INSERT INTO {self.name} (data) VALUES (?)",
-            (json.dumps(data),)
+            f"INSERT INTO {self.name} (data) VALUES (?)", (json.dumps(data),)
         )
         self.conn.commit()
         return cur.lastrowid
@@ -28,7 +26,7 @@ class Page:
             existing_data.update(data)
             self.conn.execute(
                 f"UPDATE {self.name} SET data = ? WHERE id = ?",
-                (json.dumps(existing_data), key)
+                (json.dumps(existing_data), key),
             )
             self.conn.commit()
             return key
@@ -60,12 +58,12 @@ class Page:
         values = []
 
         for field_path, condition in conditions.items():
-            json_path = '$.' + field_path.replace('.', '.')
+            json_path = "$." + field_path.replace(".", ".")
 
             if isinstance(condition, tuple):
                 operator, val = condition
             else:
-                operator, val = '=', condition
+                operator, val = "=", condition
 
             sql_clauses.append(f"json_extract(data, ?) {operator} ?")
             values.extend([json_path, val])
@@ -74,25 +72,29 @@ class Page:
         query = f"SELECT id, data FROM data WHERE {where_clause}"
         cur = self.conn.execute(query, values)
 
-        return [{'id': row[0], 'data': json.loads(row[1])} for row in cur.fetchall()]
+        return [{"id": row[0], "data": json.loads(row[1])} for row in cur.fetchall()]
 
 
 class KVStore:
-    def __init__(self, name: str = ":memory:") :
+    def __init__(self, name: str = ":memory:"):
         """Initializes an schema-less database."""
         self.conn = sqlite3.connect(name)
         self.conn.execute("PRAGMA foreign_keys = ON;")
         if name == ":memory:":
-            warnings.warn("Using in-memory database. Data will not persist after program ends.")
+            warnings.warn(
+                "Using in-memory database. Data will not persist after program ends."
+            )
 
     def page(self, name: str) -> Page:
-        self.conn.execute(f"""
+        self.conn.execute(
+            f"""
                 CREATE TABLE IF NOT EXISTS {name} (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                     data TEXT NOT NULL
                 )
-                """)
+                """
+        )
         self.conn.commit()
         return Page(name, self.conn)
 

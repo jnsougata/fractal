@@ -17,6 +17,6 @@ __version__ = "0.0.1"
 
 from .client import DB
 from .converter import *
-from .query import *
-from .schema import Field, Schema, Condition, cond
 from .kvclient import KVStore
+from .query import *
+from .schema import Condition, Field, Schema, cond

@@ -4,6 +4,7 @@ from typing import Any, Dict, Optional, Tuple
 from .converter import as_sql_type
 from .errors import FieldNotFound
 
+
 class Condition:
     def __init__(self, field: str, clause: str = None, values: Optional[Any] = None):
         self.field = field
@@ -101,7 +102,6 @@ class Condition:
         combined_values = self.values + other.values
         return Condition(self.field, combined, combined_values)
 
-
     def __repr__(self):
         return f"Condition({self.field})"
 
@@ -166,6 +166,7 @@ class Field:
             self.constraints += (
                 f"REFERENCES {ref_collection}({ref_field}) ON DELETE CASCADE "
             )
+
 
 class Schema:
     """

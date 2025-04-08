@@ -1,5 +1,5 @@
 """
-driz.errors
+fractal.errors
 ~~~~~~~~~~~~~~~~~~~~~
 
 A module containing custom exceptions for the Driz database library.

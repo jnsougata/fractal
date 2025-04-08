@@ -4,8 +4,8 @@ import uuid
 from typing import Any, Dict, List, Union
 
 from .errors import FieldNotFound
-from .schema import Schema, as_sql_type
 from .query import _Select
+from .schema import Schema, as_sql_type
 
 
 class Collection:
@@ -86,7 +86,9 @@ class Collection:
             batch.append(tuple(record[f] for f in fields))
         columns = ", ".join(fields)
         template = ", ".join("?" * len(fields))
-        self.cursor.executemany(f"INSERT INTO {self.name} ({columns}) VALUES ({template})", batch)
+        self.cursor.executemany(
+            f"INSERT INTO {self.name} ({columns}) VALUES ({template})", batch
+        )
         self.connection.commit()
         return {record["key"]: record for record in records}
 
@@ -304,5 +306,7 @@ class Collection:
                 raise TypeError(f"Incorrect type for field: {name}")
         placeholders = ", ".join(f"{k} = ?" for k in data.keys())
         args = tuple(data.values()) + (key,)
-        self.cursor.execute(f"UPDATE {self.name} SET {placeholders} WHERE key = ?", args)
+        self.cursor.execute(
+            f"UPDATE {self.name} SET {placeholders} WHERE key = ?", args
+        )
         self.connection.commit()
