@@ -162,7 +162,7 @@ class Condition:
         Returns:
             Condition: A condition object with the field, clause, and values.
         """
-        self.clause = f"{self.field} IN ({', '.join("?" * len(values))})"
+        self.clause = f"{self.field} IN ({', '.join('?' * len(values))})"
         self.values = list(values)
         return Condition(self.field, self.clause, self.values)
 
