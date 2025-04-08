@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Union
 
 from .errors import FieldNotFound
 from .query import _Select
-from .schema import Schema, as_sql_type
+from .schema import Schema
 
 
 class Collection:
