@@ -21,7 +21,7 @@ class DB:
         path (str): The path to the SQLite database file. Defaults to "driz.db".
     """
 
-    def __init__(self, path: str = "driz.db"):
+    def __init__(self, path: str = "fractal.db"):
         self.connection = sqlite3.connect(path)
         self.connection.execute("PRAGMA foreign_keys = ON;")
         self.cursor = self.connection.cursor()
