@@ -6,6 +6,8 @@ from .converter import from_sql_type
 from .errors import CollectionNotFound
 from .schema import Field, Schema
 
+__all__ = ["DB"]
+
 
 class DB:
     """

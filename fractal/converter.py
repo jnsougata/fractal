@@ -32,8 +32,3 @@ def from_sql_type(sql_type: str) -> type:
         if sql == sql_type:
             return py_type
     raise ValueError(f"Unknown SQL type: {sql_type}")
-
-
-if __name__ == "__main__":
-    converter = as_sql_type(int)
-    print(str(converter))  # Output: INTEGER

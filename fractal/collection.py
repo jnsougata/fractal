@@ -287,14 +287,7 @@ class Collection:
             key (str): The key of the record to update.
             **data: The data to update in the record.
         """
-        for name, value in data.items():
-            if not self.schema.fields.items().get(name):
-                raise ValueError(f"Invalid field: {name}")
-            if as_sql_type(type(value)) != self.schema.resolve_field_type(value):
-                raise TypeError(f"Incorrect type for field: {name}")
         placeholders = ", ".join(f"{k} = ?" for k in data.keys())
         args = tuple(data.values()) + (key,)
-        self.cursor.execute(
-            f"UPDATE {self.name} SET {placeholders} WHERE key = ?", args
-        )
+        self.cursor.execute(f"UPDATE {self.name} SET {placeholders} WHERE key = ?", args)
         self.connection.commit()
