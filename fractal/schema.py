@@ -40,7 +40,7 @@ class Field:
         ref_field: Optional[str] = None,
     ):
         self.name = name
-        self.sql_type = str(as_sql_type(dtype))
+        self.sql_type = as_sql_type(dtype)
         self.constraints = ""
         if unique:
             self.constraints += "UNIQUE "
@@ -65,6 +65,31 @@ class Schema:
         fields (Dict[str, Field]): The fields in the schema.
     """
 
+    @classmethod
+    def from_sample(cls, sample: Dict[str, Any]) -> "Schema":
+        """
+        Creates a Schema instance from a sample dictionary.
+
+        Args:
+            sample (Dict[str, Any]): A sample dictionary to infer the schema.
+        """
+        fields = []
+        for key, value in sample.items():
+            if isinstance(value, str):
+                dtype = str
+            elif isinstance(value, int):
+                dtype = int
+            elif isinstance(value, float):
+                dtype = float
+            elif isinstance(value, bytes):
+                dtype = bytes
+            elif isinstance(value, datetime):
+                dtype = datetime
+            else:
+                raise ValueError(f"Unsupported type for field '{key}': {type(value)}")
+            fields.append(Field(key, dtype))
+        return cls(*fields)
+
     def __init__(self, *fields: Field):
         """
         Initializes a Schema instance.
@@ -80,8 +105,6 @@ class Schema:
             primary.name: primary,
             timestamp.name: timestamp,
         }
-        for field in fields:
-            self.fields[field.name] = field
 
     def append(self, *fields: Field):
         """

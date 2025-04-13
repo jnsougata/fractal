@@ -69,10 +69,9 @@ class Collection:
         Returns:
             Dict[str, Any]: The inserted data with the key and timestamp.
         """
-        now = datetime.datetime.now()
         for record in records:
-            record["key"] = uuid.uuid4().hex
-            record["timestamp"] = now
+            record["key"] = uuid.uuid4().hex if not record.get("key") else record["key"]
+            record["timestamp"] = datetime.datetime.now()
             fields = record.keys()
             columns = ", ".join(fields)
             template = ", ".join("?" * len(fields))

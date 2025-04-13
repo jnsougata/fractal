@@ -17,6 +17,6 @@ __version__ = "0.0.1"
 
 from .client import DB
 from .converter import *
-from .kvclient import KVStore
+from fractal.kv.client import Store
 from .query import *
 from .schema import *
