@@ -105,6 +105,8 @@ class Schema:
             primary.name: primary,
             timestamp.name: timestamp,
         }
+        for field in fields:
+            self.fields[field.name] = field
 
     def append(self, *fields: Field):
         """

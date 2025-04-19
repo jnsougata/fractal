@@ -16,27 +16,26 @@ pip install git+https://github.com/jnsougata/fractal.git
 ## Example Usage
 
 ```python
-from fractal import cond, DB, Schema, Field
-
+from fractal import condition, DB, Schema, Field
 
 if __name__ == "__main__":
-    
+
     db = DB("example.db")
-    
+
     users = db.collection(
         name="users",
         schema=Schema(Field("name", str), Field("age", int))
     )
-    
+
     inserted = users.insert(
         {"name": "Alice", "age": 25},
         {"name": "Bob", "age": 30},
         {"name": "Charlie", "age": 35},
         {"name": "David", "age": 40},
     )
-    
-    c1 = cond("name").anyof("Alice", "Bob") and cond("age").between(20, 40)
-    c2 = cond("age").between(20, 30) and cond("name").substring("li")
+
+    c1 = condition("name").anyof("Alice", "Bob") and condition("age").between(20, 40)
+    c2 = condition("age").between(20, 30) and condition("name").substring("li")
 
     users = users.query().where(c1 or c2)
     for user in users:

@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 if TYPE_CHECKING:
     from .collection import Collection
 
-__all__ = ["_Select", "cond", "Condition"]
+__all__ = ["_Select", "condition", "Condition"]
 
 
 class Condition:
@@ -248,7 +248,7 @@ class Condition:
         return f"Condition({self.field})"
 
 
-def cond(field: str):
+def condition(field: str):
     """
     Creates a condition object for a given field.
 
