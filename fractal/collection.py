@@ -60,12 +60,17 @@ class Collection:
         self.connection.commit()
         return True
 
-    def insert(self, *records: Dict[str, Any]) -> Dict[str, Any]:
+    def insert(
+        self,
+        *records: Dict[str, Any],
+        frozen: bool = True,
+    ) -> Dict[str, Any]:
         """
         Insert records into the collection.
 
         Args:
             *records (Dict[str, Any]): The records to insert.
+            frozen (bool): If True, it will not allow new fields to be added to the records. Default is False.
         Returns:
             Dict[str, Any]: The inserted data with the key and timestamp.
         """
