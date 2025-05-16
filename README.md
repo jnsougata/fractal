@@ -1,4 +1,5 @@
-![fractal](https://github.com/user-attachments/assets/2048c2df-7f48-4ecf-b469-4ad5ee46e91f)
+![fractal (1)](https://github.com/user-attachments/assets/d1e0dde5-b693-4591-8cce-1fa097bb6e5e)
+
 
 # FractalDB - KV Store
 A fast, lightweight key-value store designed for hobbyists, combining the simplicity of NoSQL with SQLite3's robust filtering and sorting capabilities.
